@@ -14,6 +14,8 @@ public class ImageDisplay {
     private int m = 8;
     private int n = 8;
 
+    private RGB[][] dctOutput = new RGB[HEIGHT][WIDTH];
+
     /** Read Image RGB
      *  Reads the image of given width and height at the given imgPath into the provided BufferedImage.
      */
@@ -39,6 +41,10 @@ public class ImageDisplay {
 
                     int pix = 0xff000000 | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
 
+                    RGB rgb = new RGB(r, g, b);
+
+                    dctOutput[x][y] = rgb;
+
                     img.setRGB(x,y,pix);
 
                     processedImage.setRGB(x, y, pix);
@@ -46,7 +52,6 @@ public class ImageDisplay {
                     ind++;
                 }
             }
-
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -216,7 +221,7 @@ public class ImageDisplay {
         ImageDisplay ren = new ImageDisplay();
 //        ren.showIms(args);
 
-        double[][] in ={{0, 1, 2, 3, 4, 5, 6, 7},
+        double[][] in = {{0, 1, 2, 3, 4, 5, 6, 7},
                         {8, 9, 10, 11, 12, 13, 14, 15},
                         {16, 17, 18, 19, 20, 21, 22, 23},
                         {24, 25, 26, 27, 28, 29, 30, 31},

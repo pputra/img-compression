@@ -168,24 +168,69 @@ public class ImageDisplay {
         return dct;
     }
 
+    private void zigZagTraversal(double[][] in) {
+        int maxCount = m * n;
+        int count = 0;
+        int row = 0;
+        int col = 0;
+        boolean isDiagonalLeft = true;
+        System.out.println(in[row][col]);
+        count++;
+        col++;
+
+        while (count < maxCount) {
+            if (row >= n || row < 0 || col >= m || col < 0) {
+                if (isDiagonalLeft) {
+                    if (row >= n) {
+                        col++;
+                    } else {
+                        row++;
+                    }
+                    row--;
+                    col++;
+                } else {
+                    if (col >= m) {
+                        row++;
+                    } else {
+                        col++;
+                    }
+                    row++;
+                    col--;
+                }
+                isDiagonalLeft = !isDiagonalLeft;
+            }
+
+            System.out.println(in[row][col]);
+            if (isDiagonalLeft) {
+                row++;
+                col--;
+            } else {
+                row--;
+                col++;
+            }
+            count++;
+        }
+    }
+
     public static void main(String[] args) {
         ImageDisplay ren = new ImageDisplay();
 //        ren.showIms(args);
 
-        double[][] in = { { 255, 255, 255, 255, 255, 255, 255, 255 },
-                { 255, 255, 255, 255, 255, 255, 255, 255 },
-                { 255, 255, 255, 255, 255, 255, 255, 255 },
-                { 255, 255, 255, 255, 255, 255, 255, 255 },
-                { 255, 255, 255, 255, 255, 255, 255, 255 },
-                { 255, 255, 255, 255, 255, 255, 255, 255 },
-                { 255, 255, 255, 255, 255, 255, 255, 255 },
-                { 255, 255, 255, 255, 255, 255, 255, 255 } };
+        double[][] in ={{0, 1, 2, 3, 4, 5, 6, 7},
+                        {8, 9, 10, 11, 12, 13, 14, 15},
+                        {16, 17, 18, 19, 20, 21, 22, 23},
+                        {24, 25, 26, 27, 28, 29, 30, 31},
+                        {32, 33, 34, 35, 36, 37, 38, 39},
+                        {40, 41, 42, 43, 44, 45, 46, 47},
+                        {48, 49, 50, 51, 52, 53, 54, 55},
+                        {56, 57, 58, 59, 60, 61, 62, 63}};
 
-        double[][] dct = ren.transformDCT(in);
-        print2dArr(dct);
-
-        double[][] idct = ren.transformIDCT(dct);
-        print2dArr(idct);
+//        double[][] dct = ren.transformDCT(in);
+//        print2dArr(dct);
+//
+//        double[][] idct = ren.transformIDCT(dct);
+//        print2dArr(idct);
+        ren.zigZagTraversal(in);
     }
 
     private static void print2dArr(double[][] arr) {

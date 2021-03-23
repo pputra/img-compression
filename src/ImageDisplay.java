@@ -11,6 +11,8 @@ public class ImageDisplay {
     private BufferedImage processedImage;
     private final int WIDTH = 512;
     private final int HEIGHT = 512;
+    private int m = 8;
+    private int n = 8;
 
     /** Read Image RGB
      *  Reads the image of given width and height at the given imgPath into the provided BufferedImage.
@@ -92,8 +94,107 @@ public class ImageDisplay {
         frame.setVisible(true);
     }
 
+    public double[][] transformDCT(double[][] in) {
+        int u, v, x, y;
+
+        double cu, cv, sum;
+
+        double[][] dct = new double[m][n];
+
+        for (u = 0; u < m; u++) {
+            for (v = 0; v < n; v++) {
+                if (u == 0) {
+                    cu = 1.0 / Math.sqrt(2);
+                } else {
+                    cu = 1.0;
+                }
+
+                if (v == 0) {
+                    cv = 1.0 / Math.sqrt(2);
+                } else {
+                    cv = 1.0;
+                }
+
+                sum = 0;
+
+                for (x = 0; x < m; x++) {
+                    for (y = 0; y < n; y++) {
+                        sum += in[x][y] *
+                                Math.cos((2.0 * x + 1.0) * u * Math.PI/16.0) *
+                                Math.cos((2.0 * y + 1.0) * v * Math.PI/16.0);
+                    }
+                }
+                dct[u][v] = Math.round(0.25 * cu * cv * sum);
+            }
+        }
+
+        return dct;
+    }
+
+    public double[][] transformIDCT(double[][] in) {
+        int u, v, x, y;
+
+        double cu, cv, sum;
+
+        double[][] dct = new double[m][n];
+
+        for (u = 0; u < m; u++) {
+            for (v = 0; v < n; v++) {
+                sum = 0;
+
+                for (x = 0; x < m; x++) {
+                    for (y = 0; y < n; y++) {
+                        if (x == 0) {
+                            cu = 1.0 / Math.sqrt(2);
+                        } else {
+                            cu = 1.0;
+                        }
+
+                        if (y == 0) {
+                            cv = 1.0 / Math.sqrt(2);
+                        } else {
+                            cv = 1.0;
+                        }
+
+                        sum += in[x][y] * cu * cv *
+                                Math.cos((2.0 * u + 1.0) * x * Math.PI/16.0) *
+                                Math.cos((2.0 * v + 1.0) * y * Math.PI/16.0);
+                    }
+                }
+                dct[u][v] = Math.round(0.25 * sum);
+            }
+        }
+
+        return dct;
+    }
+
     public static void main(String[] args) {
         ImageDisplay ren = new ImageDisplay();
-        ren.showIms(args);
+//        ren.showIms(args);
+
+        double[][] in = { { 255, 255, 255, 255, 255, 255, 255, 255 },
+                { 255, 255, 255, 255, 255, 255, 255, 255 },
+                { 255, 255, 255, 255, 255, 255, 255, 255 },
+                { 255, 255, 255, 255, 255, 255, 255, 255 },
+                { 255, 255, 255, 255, 255, 255, 255, 255 },
+                { 255, 255, 255, 255, 255, 255, 255, 255 },
+                { 255, 255, 255, 255, 255, 255, 255, 255 },
+                { 255, 255, 255, 255, 255, 255, 255, 255 } };
+
+        double[][] dct = ren.transformDCT(in);
+        print2dArr(dct);
+
+        double[][] idct = ren.transformIDCT(dct);
+        print2dArr(idct);
+    }
+
+    private static void print2dArr(double[][] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                System.out.print(arr[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }

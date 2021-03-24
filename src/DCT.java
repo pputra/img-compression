@@ -158,6 +158,8 @@ public class DCT {
 
             if (count >= numCoefficient) {
                 rgbChannels[row + offsetRow][col + offsetCol].setR(0);
+                rgbChannels[row + offsetRow][col + offsetCol].setG(0);
+                rgbChannels[row + offsetRow][col + offsetCol].setB(0);
             }
 
             if (isDiagonalLeft) {

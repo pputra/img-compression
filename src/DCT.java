@@ -36,7 +36,7 @@ public class DCT {
     public RGB[][] transformDCT(RGB[][] in) {
         int u, v, x, y;
 
-        double cu, cv, rSum;
+        double cu, cv, rSum, gSum, bSum;
 
         RGB[][] dct = getChannelsBuffer(m, n);
 
@@ -55,15 +55,25 @@ public class DCT {
                 }
 
                 rSum = 0;
+                gSum = 0;
+                bSum = 0;
 
                 for (x = 0; x < m; x++) {
                     for (y = 0; y < n; y++) {
-                        rSum += in[x][y].getR() *
-                                Math.cos((2.0 * x + 1.0) * u * Math.PI/16.0) *
+                        double cosProducts = Math.cos((2.0 * x + 1.0) * u * Math.PI/16.0) *
                                 Math.cos((2.0 * y + 1.0) * v * Math.PI/16.0);
+
+                        rSum += in[x][y].getR() * cosProducts;
+
+                        gSum += in[x][y].getG() * cosProducts;
+
+                        bSum += in[x][y].getB() * cosProducts;
+
                     }
                 }
                 dct[u][v].setR((int) Math.round(0.25 * cu * cv * rSum));
+                dct[u][v].setG((int) Math.round(0.25 * cu * cv * gSum));
+                dct[u][v].setB((int) Math.round(0.25 * cu * cv * bSum));
             }
         }
 

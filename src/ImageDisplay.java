@@ -69,6 +69,15 @@ public class ImageDisplay {
     public void showIms(String[] args) {
         // Read a parameter from command line
         numCoefficient = Integer.parseInt(args[1]);
+//        numCoefficient = 65536;
+//        numCoefficient = 16384;
+//        numCoefficient = 4096;
+//        numCoefficient = 1024;
+//        numCoefficient = 256;
+//        numCoefficient = 64;
+//        numCoefficient = 16;
+//        numCoefficient = 4;
+//        numCoefficient = 1;
 
         // Read in the specified image
         originalImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);

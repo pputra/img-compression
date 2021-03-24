@@ -1,10 +1,10 @@
 public class DCT {
-    private RGB[][] rgbChannels;
-    private int height;
-    private int width;
-    private int m;
-    private int n;
-    private int numCoefficient;
+    private final RGB[][] rgbChannels;
+    private final int height;
+    private final int width;
+    private final int m;
+    private final int n;
+    private final int numCoefficient;
 
     public DCT(int height, int width, int m, int n, int numCoefficient) {
         this.height = height;
@@ -21,6 +21,8 @@ public class DCT {
                 RGB[][] currDCTChannels = transformDCT(getMbyNBlockChannels(offsetRow, offsetCol));
 
                 updateRGBChannelsBlock(currDCTChannels, offsetRow, offsetCol);
+
+                quantize(offsetRow, offsetCol);
 
                 RGB[][] currIDCTChannels = transformIDCT(getMbyNBlockChannels(offsetRow, offsetCol));
 
@@ -105,13 +107,12 @@ public class DCT {
         return dct;
     }
 
-    private void zigZagTraversal(double[][] in) {
+    private void quantize(int offsetRow, int offsetCol) {
         int maxCount = m * n;
         int count = 0;
         int row = 0;
         int col = 0;
         boolean isDiagonalLeft = true;
-        System.out.println(in[row][col]);
         count++;
         col++;
 
@@ -137,7 +138,10 @@ public class DCT {
                 isDiagonalLeft = !isDiagonalLeft;
             }
 
-            System.out.println(in[row][col]);
+            if (count >= numCoefficient) {
+                rgbChannels[row + offsetRow][col + offsetCol].setR(0);
+            }
+
             if (isDiagonalLeft) {
                 row++;
                 col--;
@@ -145,6 +149,7 @@ public class DCT {
                 row--;
                 col++;
             }
+
             count++;
         }
     }

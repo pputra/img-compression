@@ -45,17 +45,23 @@ public class ImageDisplay {
 
                     RGB rgb = new RGB(r, g, b);
 
-                    dctOutput.getRgbChannels()[x][y] = rgb;
+                    dctOutput.getRgbChannels()[y][x] = rgb;
 
                     img.setRGB(x,y,pix);
-
-                    processedImage.setRGB(x, y, pix);
-
                     ind++;
                 }
             }
 
             dctOutput.compress();
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    RGB rgb = dctOutput.getRgbChannels()[y][x];
+
+                    int pix = 0xff000000 | ((rgb.getR()) << 16) | ((rgb.getG()) << 8) | (rgb.getB());
+                    processedImage.setRGB(x, y, pix);
+                }
+            }
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();

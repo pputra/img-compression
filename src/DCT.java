@@ -4,12 +4,14 @@ public class DCT {
     private int width;
     private int m;
     private int n;
+    private int numCoefficient;
 
-    public DCT(int height, int width, int m, int n) {
+    public DCT(int height, int width, int m, int n, int numCoefficient) {
         this.height = height;
         this.width = width;
         this.m = m;
         this.n = n;
+        this.numCoefficient = (int) Math.ceil(numCoefficient / 4096.0);
         rgbChannels = new RGB[height][width];
     }
 

@@ -13,8 +13,9 @@ public class ImageDisplay {
     private final int HEIGHT = 512;
     private int m = 8;
     private int n = 8;
+    private int numCoefficient;
 
-    private DCT dctOutput = new DCT(HEIGHT, WIDTH, m, n);
+    private DCT dctOutput;
 
     /** Read Image RGB
      *  Reads the image of given width and height at the given imgPath into the provided BufferedImage.
@@ -33,6 +34,7 @@ public class ImageDisplay {
             raf.read(bytes);
 
             int ind = 0;
+            dctOutput = new DCT(HEIGHT, WIDTH, m, n, numCoefficient);
             for(int y = 0; y < height; y++) {
                 for(int x = 0; x < width; x++) {
                     byte r = bytes[ind];
@@ -66,6 +68,7 @@ public class ImageDisplay {
 
     public void showIms(String[] args) {
         // Read a parameter from command line
+        numCoefficient = Integer.parseInt(args[1]);
 
         // Read in the specified image
         originalImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);

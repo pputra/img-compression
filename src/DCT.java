@@ -30,7 +30,7 @@ public class DCT {
             }
         }
 
-        print2dArr(rgbChannels);
+//        print2dArr(rgbChannels);
     }
 
     public RGB[][] transformDCT(RGB[][] in) {
@@ -116,9 +116,10 @@ public class DCT {
                         bSum += in[x][y].getB() * cosProducts;
                     }
                 }
-                dct[u][v].setR((int) Math.round(0.25 * rSum));
-                dct[u][v].setG((int) Math.round(0.25 * gSum));
-                dct[u][v].setB((int) Math.round(0.25 * bSum));
+
+                dct[u][v].setR(Math.min(Math.max((int) Math.round(0.25 * rSum), 0), 255));
+                dct[u][v].setG(Math.min(Math.max((int) Math.round(0.25 * gSum), 0), 255));
+                dct[u][v].setB(Math.min(Math.max((int) Math.round(0.25 * bSum), 0), 255));
             }
         }
 

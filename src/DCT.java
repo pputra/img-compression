@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class DCT {
     private RGB[][] rgbChannels;
     private int height;
@@ -12,22 +10,31 @@ public class DCT {
         this.width = width;
         this.m = m;
         this.n = n;
-        rgbChannels = new RGB[width][height];
+        rgbChannels = new RGB[height][width];
     }
 
-    public DCT(RGB[][] rgbChannels) {
-        this.rgbChannels = new RGB[rgbChannels.length][];
-        for (int i = 0; i < rgbChannels.length; i++) {
-            rgbChannels[i] = Arrays.copyOf(rgbChannels[i], rgbChannels[i].length);
+    public void compress() {
+        int offsetRow = 0;
+        int offsetCol = 0;
+        RGB[][] blockChannels = getMbyNBlockChannels(offsetRow, offsetCol);
+
+        RGB[][] currDCTChannels = transformDCT(blockChannels);
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j <  n; j++) {
+                rgbChannels[i + offsetRow][j + offsetCol] = currDCTChannels[i][j];
+            }
         }
+
+        print2dArr(rgbChannels);
     }
 
-    public double[][] transformDCT(double[][] in) {
+    public RGB[][] transformDCT(RGB[][] in) {
         int u, v, x, y;
 
-        double cu, cv, sum;
+        double cu, cv, rSum;
 
-        double[][] dct = new double[m][n];
+        RGB[][] dct = getChannelsBuffer(m, n);
 
         for (u = 0; u < m; u++) {
             for (v = 0; v < n; v++) {
@@ -43,23 +50,23 @@ public class DCT {
                     cv = 1.0;
                 }
 
-                sum = 0;
+                rSum = 0;
 
                 for (x = 0; x < m; x++) {
                     for (y = 0; y < n; y++) {
-                        sum += in[x][y] *
+                        rSum += in[x][y].getR() *
                                 Math.cos((2.0 * x + 1.0) * u * Math.PI/16.0) *
                                 Math.cos((2.0 * y + 1.0) * v * Math.PI/16.0);
                     }
                 }
-                dct[u][v] = Math.round(0.25 * cu * cv * sum);
+                dct[u][v].setR((int) Math.round(0.25 * cu * cv * rSum));
             }
         }
 
         return dct;
     }
 
-    public double[][] transformIDCT(double[][] in) {
+    private double[][] transformIDCT(double[][] in) {
         int u, v, x, y;
 
         double cu, cv, sum;
@@ -140,7 +147,41 @@ public class DCT {
         }
     }
 
+    private RGB[][] getMbyNBlockChannels(int offsetRow, int offsetCol) {
+        RGB[][] copiedChannel = new RGB[m][n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                copiedChannel[i][j] = new RGB(rgbChannels[i + offsetRow][j + offsetCol]);
+            }
+        }
+
+        return copiedChannel;
+    }
+
+    private RGB[][] getChannelsBuffer(int height, int width) {
+        RGB[][] buffer = new RGB[height][width];
+
+        for (int i = 0; i < buffer.length; i++) {
+            for (int j = 0; j < buffer[i].length; j++) {
+                buffer[i][j] = new RGB(0, 0, 0);
+            }
+        }
+
+        return buffer;
+    }
+
     public RGB[][] getRgbChannels() {
         return rgbChannels;
+    }
+
+    private static void print2dArr(RGB[][] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                System.out.print(arr[i][j].getR() + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }

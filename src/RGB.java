@@ -15,6 +15,12 @@ public class RGB {
         this.b = Byte.toUnsignedInt(b);
     }
 
+    public RGB(RGB otherRGB) {
+        this.r = otherRGB.r;
+        this.g = otherRGB.g;
+        this.b = otherRGB.b;
+    }
+
     public int getR() {
         return r;
     }

@@ -41,7 +41,8 @@ public class ImageDisplay {
 
                     int pix = 0xff000000 | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
 
-                    RGB rgb = new RGB(r, g, b);
+                    // 255 FOR TESTING PURPOSE
+                    RGB rgb = new RGB(255, g, b);
 
                     dctOutput.getRgbChannels()[x][y] = rgb;
 
@@ -52,6 +53,8 @@ public class ImageDisplay {
                     ind++;
                 }
             }
+
+            dctOutput.compress();
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -101,16 +104,6 @@ public class ImageDisplay {
 
     public static void main(String[] args) {
         ImageDisplay ren = new ImageDisplay();
-//        ren.showIms(args);
-    }
-
-    private static void print2dArr(double[][] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                System.out.print(arr[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println();
+        ren.showIms(args);
     }
 }

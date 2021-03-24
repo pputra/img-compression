@@ -14,15 +14,17 @@ public class DCT {
     }
 
     public void compress() {
-        int offsetRow = 0;
-        int offsetCol = 0;
-        RGB[][] blockChannels = getMbyNBlockChannels(offsetRow, offsetCol);
+        for (int offsetRow = 0; offsetRow < height; offsetRow += m) {
+            for (int offsetCol = 0; offsetCol < width; offsetCol += n) {
+                RGB[][] blockChannels = getMbyNBlockChannels(offsetRow, offsetCol);
 
-        RGB[][] currDCTChannels = transformDCT(blockChannels);
+                RGB[][] currDCTChannels = transformDCT(blockChannels);
 
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j <  n; j++) {
-                rgbChannels[i + offsetRow][j + offsetCol] = currDCTChannels[i][j];
+                for (int i = 0; i < m; i++) {
+                    for (int j = 0; j <  n; j++) {
+                        rgbChannels[i + offsetRow][j + offsetCol] = currDCTChannels[i][j];
+                    }
+                }
             }
         }
 

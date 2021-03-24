@@ -16,15 +16,13 @@ public class DCT {
     public void compress() {
         for (int offsetRow = 0; offsetRow < height; offsetRow += m) {
             for (int offsetCol = 0; offsetCol < width; offsetCol += n) {
-                RGB[][] blockChannels = getMbyNBlockChannels(offsetRow, offsetCol);
+                RGB[][] currDCTChannels = transformDCT(getMbyNBlockChannels(offsetRow, offsetCol));
 
-                RGB[][] currDCTChannels = transformDCT(blockChannels);
+                updateRGBChannelsBlock(currDCTChannels, offsetRow, offsetCol);
 
-                for (int i = 0; i < m; i++) {
-                    for (int j = 0; j <  n; j++) {
-                        rgbChannels[i + offsetRow][j + offsetCol] = currDCTChannels[i][j];
-                    }
-                }
+                RGB[][] currIDCTChannels = transformIDCT(getMbyNBlockChannels(offsetRow, offsetCol));
+
+                updateRGBChannelsBlock(currIDCTChannels, offsetRow, offsetCol);
             }
         }
 
@@ -68,16 +66,16 @@ public class DCT {
         return dct;
     }
 
-    private double[][] transformIDCT(double[][] in) {
+    private RGB[][] transformIDCT(RGB[][] in) {
         int u, v, x, y;
 
-        double cu, cv, sum;
+        double cu, cv, rSum;
 
-        double[][] dct = new double[m][n];
+        RGB[][] dct = getChannelsBuffer(m, n);
 
         for (u = 0; u < m; u++) {
             for (v = 0; v < n; v++) {
-                sum = 0;
+                rSum = 0;
 
                 for (x = 0; x < m; x++) {
                     for (y = 0; y < n; y++) {
@@ -93,12 +91,12 @@ public class DCT {
                             cv = 1.0;
                         }
 
-                        sum += in[x][y] * cu * cv *
+                        rSum += in[x][y].getR() * cu * cv *
                                 Math.cos((2.0 * u + 1.0) * x * Math.PI/16.0) *
                                 Math.cos((2.0 * v + 1.0) * y * Math.PI/16.0);
                     }
                 }
-                dct[u][v] = Math.round(0.25 * sum);
+                dct[u][v].setR((int) Math.round(0.25 * rSum));
             }
         }
 
@@ -159,6 +157,12 @@ public class DCT {
         }
 
         return copiedChannel;
+    }
+
+    private void updateRGBChannelsBlock(RGB[][] newRGBChannels, int offsetRow, int offsetCol) {
+        for (int i = 0; i < m; i++) {
+            System.arraycopy(newRGBChannels[i], 0, rgbChannels[i + offsetRow], offsetCol, n);
+        }
     }
 
     private RGB[][] getChannelsBuffer(int height, int width) {

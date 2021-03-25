@@ -11,15 +11,17 @@ public class DWT {
         rgbChannels = new RGB[height][width];
     }
 
-    public void compress() {
+    private RGB[][] getColumnDecompositionChannels(RGB[][] inputChannels, int height, int width) {
         int midWidth = width / 2;
+
         RGB[][] decompositionBuffer = new RGB[height][width];
 
         for (int i = 0; i < height; i++) {
             int bufferIndex = 0;
+
             for (int j = 0; j < width; j += 2) {
-                RGB rgb1 = rgbChannels[i][j];
-                RGB rgb2 = rgbChannels[i][j+1];
+                RGB rgb1 = inputChannels[i][j];
+                RGB rgb2 = inputChannels[i][j+1];
 
                 int rAvg = (int) Math.round((rgb1.getR() + rgb2.getR()) / 2.0);
                 int gAvg = (int) Math.round((rgb1.getG() + rgb2.getG()) / 2.0);
@@ -32,9 +34,10 @@ public class DWT {
 
         for (int i = 0; i < height; i++) {
             int bufferIndex = midWidth;
+
             for (int j = 0; j < width; j += 2) {
-                RGB rgb1 = rgbChannels[i][j];
-                RGB rgb2 = rgbChannels[i][j+1];
+                RGB rgb1 = inputChannels[i][j];
+                RGB rgb2 = inputChannels[i][j+1];
 
                 int rAvg = (int) Math.round((rgb1.getR() - rgb2.getR()) / 2.0);
                 int gAvg = (int) Math.round((rgb1.getG() - rgb2.getG()) / 2.0);
@@ -45,14 +48,21 @@ public class DWT {
             }
         }
 
+        return decompositionBuffer;
+    }
+
+    private RGB[][] getColumnConstructionChannels(RGB[][] decomposedChannels, int height, int width) {
+        int midWidth = width / 2;
+
         RGB[][] constructionBuffer = new RGB[height][width];
 
         for (int i = 0; i < height; i++) {
             int bufferIndex = 0;
-            for (int j = 0; j < midWidth; j++) {
-                RGB rgb1 = decompositionBuffer[i][j];
 
-                RGB rgb2 = decompositionBuffer[i][j+midWidth];
+            for (int j = 0; j < midWidth; j++) {
+                RGB rgb1 = decomposedChannels[i][j];
+                RGB rgb2 = decomposedChannels[i][j+midWidth];
+
                 int constructedR = rgb1.getR() + rgb2.getR();
                 int constructedG = rgb1.getG() + rgb2.getG();
                 int constructedB = rgb1.getB() + rgb2.getB();
@@ -71,7 +81,13 @@ public class DWT {
             }
         }
 
-        rgbChannels = constructionBuffer;
+        return constructionBuffer;
+    }
+
+    public void compress() {
+        RGB[][] decomposedChannels = getColumnDecompositionChannels(rgbChannels, height, width);
+
+        rgbChannels = getColumnConstructionChannels(decomposedChannels, height, width);
     }
 
     public RGB[][] getRgbChannels() {

@@ -149,4 +149,18 @@ public class DWT {
 
         return new RGB(r, g, b);
     }
+
+    private int getNumDecompositionSteps() {
+        int numStep = 0;
+
+        int currCoefficient = height * width;
+
+        while (currCoefficient != numCoefficient) {
+            currCoefficient /= 4;
+
+            numStep++;
+        }
+
+        return numStep;
+    }
 }

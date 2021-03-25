@@ -16,6 +16,7 @@ public class ImageDisplay {
     private int numCoefficient;
 
     private DCT dctOutput;
+    private DWT dwtOutput;
 
     /** Read Image RGB
      *  Reads the image of given width and height at the given imgPath into the provided BufferedImage.
@@ -35,6 +36,8 @@ public class ImageDisplay {
 
             int ind = 0;
             dctOutput = new DCT(HEIGHT, WIDTH, m, n, numCoefficient);
+            dwtOutput = new DWT(HEIGHT, WIDTH, numCoefficient);
+
             for(int y = 0; y < height; y++) {
                 for(int x = 0; x < width; x++) {
                     byte r = bytes[ind];
@@ -46,17 +49,20 @@ public class ImageDisplay {
                     RGB rgb = new RGB(r, g, b);
 
                     dctOutput.getRgbChannels()[y][x] = rgb;
+                    dwtOutput.getRgbChannels()[y][x] = rgb;
 
                     img.setRGB(x,y,pix);
                     ind++;
                 }
             }
 
-            dctOutput.compress();
+//            dctOutput.compress();
+            dwtOutput.compress();
 
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    RGB rgb = dctOutput.getRgbChannels()[y][x];
+//                    RGB rgb = dctOutput.getRgbChannels()[y][x];
+                    RGB rgb = dwtOutput.getRgbChannels()[y][x];
 
                     int pix = 0xff000000 | ((rgb.getR()) << 16) | ((rgb.getG()) << 8) | (rgb.getB());
                     processedImage.setRGB(x, y, pix);

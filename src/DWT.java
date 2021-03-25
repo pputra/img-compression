@@ -45,7 +45,33 @@ public class DWT {
             }
         }
 
-        rgbChannels = decompositionBuffer;
+        RGB[][] constructionBuffer = new RGB[height][width];
+
+        for (int i = 0; i < height; i++) {
+            int bufferIndex = 0;
+            for (int j = 0; j < midWidth; j++) {
+                RGB rgb1 = decompositionBuffer[i][j];
+
+                RGB rgb2 = decompositionBuffer[i][j+midWidth];
+                int constructedR = rgb1.getR() + rgb2.getR();
+                int constructedG = rgb1.getG() + rgb2.getG();
+                int constructedB = rgb1.getB() + rgb2.getB();
+
+                constructionBuffer[i][bufferIndex] = new RGB(constructedR, constructedG, constructedB);
+
+                constructedR = rgb1.getR() - rgb2.getR();
+                constructedG = rgb1.getG() - rgb2.getG();
+                constructedB = rgb1.getB() - rgb2.getB();
+
+                bufferIndex++;
+
+                constructionBuffer[i][bufferIndex] = new RGB(constructedR, constructedG, constructedB);
+
+                bufferIndex++;
+            }
+        }
+
+        rgbChannels = constructionBuffer;
     }
 
     public RGB[][] getRgbChannels() {

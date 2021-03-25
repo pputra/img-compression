@@ -16,11 +16,15 @@ public class DWT {
     }
 
     public void compress() {
-//        RGB[][] decomposedChannels = getColumnDecompositionChannels(rgbChannels, height, width);
-//
-//        rgbChannels = getColumnConstructionChannels(decomposedChannels, height, width);
+        RGB[][] decomposedColumnChannels = getColumnDecompositionChannels(rgbChannels, height, width);
 
-        rgbChannels = getRowDecompositionChannels(rgbChannels, height, width);
+        RGB[][] decomposedRowChannels = getRowDecompositionChannels(decomposedColumnChannels, height, width);
+
+        RGB[][] constructedRowChannel = getRowConstructionChannels(decomposedRowChannels, height, width);
+
+        RGB[][] constructedColumnChannel = getColumnConstructionChannels(constructedRowChannel, height, width);
+
+        rgbChannels = constructedColumnChannel;
     }
 
     private RGB[][] getColumnDecompositionChannels(RGB[][] inputChannels, int height, int width) {
@@ -28,24 +32,24 @@ public class DWT {
 
         RGB[][] decompositionBuffer = new RGB[height][width];
 
-        for (int i = 0; i < height; i++) {
+        for (int row = 0; row < height; row++) {
             int bufferIndex = 0;
 
-            for (int j = 0; j < width; j += 2) {
-                RGB rgb1 = inputChannels[i][j];
-                RGB rgb2 = inputChannels[i][j+1];
-                decompositionBuffer[i][bufferIndex] = getSumCoefficient(rgb1, rgb2, true);
+            for (int col = 0; col < width; col += 2) {
+                RGB rgb1 = inputChannels[row][col];
+                RGB rgb2 = inputChannels[row][col+1];
+                decompositionBuffer[row][bufferIndex] = getSumCoefficient(rgb1, rgb2, true);
                 bufferIndex++;
             }
         }
 
-        for (int i = 0; i < height; i++) {
+        for (int row = 0; row < height; row++) {
             int bufferIndex = midWidth;
 
-            for (int j = 0; j < width; j += 2) {
-                RGB rgb1 = inputChannels[i][j];
-                RGB rgb2 = inputChannels[i][j+1];
-                decompositionBuffer[i][bufferIndex] = getDiffCoefficient(rgb1, rgb2, true);
+            for (int col = 0; col < width; col += 2) {
+                RGB rgb1 = inputChannels[row][col];
+                RGB rgb2 = inputChannels[row][col+1];
+                decompositionBuffer[row][bufferIndex] = getDiffCoefficient(rgb1, rgb2, true);
                 bufferIndex++;
             }
         }
@@ -89,15 +93,36 @@ public class DWT {
 
         RGB[][] constructionBuffer = new RGB[height][width];
 
-        for (int i = 0; i < height; i++) {
+        for (int row = 0; row < height; row++) {
             int bufferIndex = 0;
 
-            for (int j = 0; j < midWidth; j++) {
-                RGB rgb1 = decomposedChannels[i][j];
-                RGB rgb2 = decomposedChannels[i][j+midWidth];
-                constructionBuffer[i][bufferIndex] = getSumCoefficient(rgb1, rgb2, false);
+            for (int col = 0; col < midWidth; col++) {
+                RGB rgb1 = decomposedChannels[row][col];
+                RGB rgb2 = decomposedChannels[row][col+midWidth];
+                constructionBuffer[row][bufferIndex] = getSumCoefficient(rgb1, rgb2, false);
                 bufferIndex++;
-                constructionBuffer[i][bufferIndex] = getDiffCoefficient(rgb1, rgb2, false);
+                constructionBuffer[row][bufferIndex] = getDiffCoefficient(rgb1, rgb2, false);
+                bufferIndex++;
+            }
+        }
+
+        return constructionBuffer;
+    }
+
+    private RGB[][] getRowConstructionChannels(RGB[][] decomposedChannels, int height, int width) {
+        int midHeight = height / 2;
+
+        RGB[][] constructionBuffer = new RGB[height][width];
+
+        for (int col = 0; col < width; col++) {
+            int bufferIndex = 0;
+
+            for (int row = 0; row < midHeight; row++) {
+                RGB rgb1 = decomposedChannels[row+midHeight][col];
+                RGB rgb2 = decomposedChannels[row][col];
+                constructionBuffer[bufferIndex][col] = getSumCoefficient(rgb1, rgb2, false);
+                bufferIndex++;
+                constructionBuffer[bufferIndex][col] = getDiffCoefficient(rgb1, rgb2, false);
                 bufferIndex++;
             }
         }

@@ -50,6 +50,8 @@ public class DWT {
             initialChannels = getSubChannels(rgbChannels, height - currHeight, currHeight, currWidth);
         }
 
+        quantize();
+
         RGB[][] constructedRowChannels;
 
         RGB[][] constructedColumnChannels;
@@ -200,6 +202,30 @@ public class DWT {
         int b = (int) Math.round((rgb1.getB() - rgb2.getB()) / denominator);
 
         return new RGB(r, g, b);
+    }
+
+    private void quantize() {
+        int size = (int) Math.sqrt(numCoefficient);
+
+        int startRow = height - size;
+
+        if (startRow == 0) return;
+
+        RGB[][] quantizedChannels = new RGB[height][width];
+
+        for (int i = 0; i < quantizedChannels.length; i++) {
+            for (int j = 0; j < quantizedChannels[i].length; j++) {
+                quantizedChannels[i][j] = new RGB(0, 0, 0);
+            }
+        }
+
+        for (int row = startRow; row < height; row++) {
+            for (int col = 0; col < size; col++) {
+                quantizedChannels[row][col] = rgbChannels[row][col];
+            }
+        }
+
+        rgbChannels = quantizedChannels;
     }
 
     private int getNumDecompositionSteps() {

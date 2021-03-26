@@ -3,7 +3,6 @@ public class DWT {
     private final int height;
     private final int width;
     private final int numCoefficient;
-    final int[] LOW_PASS_START_ROWS = new int[]{256, 384, 448, 480, 496, 504, 508, 510, 511};
 
     public DWT(int height, int width, int numCoefficient) {
         this.height = height;
@@ -48,7 +47,35 @@ public class DWT {
 
             currWidth /= 2;
 
-            initialChannels = getSubChannels(rgbChannels, LOW_PASS_START_ROWS[i], currHeight, currWidth);
+            initialChannels = getSubChannels(rgbChannels, height - currHeight, currHeight, currWidth);
+        }
+
+        RGB[][] constructedRowChannels;
+
+        RGB[][] constructedColumnChannels;
+
+        initialChannels = rgbChannels;
+
+        for (int i = 0; i < numSteps; i++) {
+            currHeight *= 2;
+
+            currWidth *= 2;
+
+            RGB[][] subChannels = getSubChannels(initialChannels, height - currHeight, currHeight, currWidth);
+
+            constructedRowChannels = getRowConstructionChannels(subChannels, currHeight, currWidth);
+
+            constructedColumnChannels = getColumnConstructionChannels(constructedRowChannels, currHeight, currWidth);
+
+            if (i != numSteps - 1) {
+                for (int row = 0; row < constructedColumnChannels.length; row++) {
+                    for (int col = 0; col < constructedColumnChannels[row].length ; col++) {
+                        rgbChannels[row+height-currHeight][col] = constructedColumnChannels[row][col];
+                    }
+                }
+            } else {
+                rgbChannels = constructedColumnChannels;
+            }
         }
     }
 

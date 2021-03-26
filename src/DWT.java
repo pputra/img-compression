@@ -3,6 +3,7 @@ public class DWT {
     private final int height;
     private final int width;
     private final int numCoefficient;
+    final int[] LOW_PASS_START_ROWS = new int[]{256, 384, 448, 480, 496, 504, 508, 510, 511};
 
     public DWT(int height, int width, int numCoefficient) {
         this.height = height;
@@ -16,15 +17,39 @@ public class DWT {
     }
 
     public void compress() {
-        RGB[][] decomposedColumnChannels = getColumnDecompositionChannels(rgbChannels, height, width);
+        int numSteps = getNumDecompositionSteps();
 
-        RGB[][] decomposedRowChannels = getRowDecompositionChannels(decomposedColumnChannels, height, width);
+        RGB[][] decomposedColumnChannels;
 
-        RGB[][] constructedRowChannel = getRowConstructionChannels(decomposedRowChannels, height, width);
+        RGB[][] decomposedRowChannels;
 
-        RGB[][] constructedColumnChannel = getColumnConstructionChannels(constructedRowChannel, height, width);
+        int currHeight = height;
 
-        rgbChannels = constructedColumnChannel;
+        int currWidth = width;
+
+        RGB[][] initialChannels = rgbChannels;
+
+        for (int i = 0; i < numSteps; i++) {
+            decomposedColumnChannels = getColumnDecompositionChannels(initialChannels, currHeight, currWidth);
+
+            decomposedRowChannels = getRowDecompositionChannels(decomposedColumnChannels, currHeight, currWidth);
+
+            if (i > 0) {
+                for (int row = 0; row < decomposedRowChannels.length; row++) {
+                    for (int col = 0; col < decomposedRowChannels[row].length ; col++) {
+                        rgbChannels[row+height-currHeight][col] = decomposedRowChannels[row][col];
+                    }
+                }
+            } else {
+                rgbChannels = decomposedRowChannels;
+            }
+
+            currHeight /= 2;
+
+            currWidth /= 2;
+
+            initialChannels = getSubChannels(rgbChannels, LOW_PASS_START_ROWS[i], currHeight, currWidth);
+        }
     }
 
     private RGB[][] getColumnDecompositionChannels(RGB[][] inputChannels, int height, int width) {
@@ -162,5 +187,17 @@ public class DWT {
         }
 
         return numStep;
+    }
+
+    private RGB[][] getSubChannels(RGB[][] channels, int startRow, int height, int width) {
+        RGB[][] subChannels = new RGB[height][width];
+
+        for (int row = 0; row < subChannels.length; row++) {
+            for (int col = 0; col < subChannels[row].length; col++) {
+                subChannels[row][col] = channels[row + startRow][col];
+            }
+        }
+
+        return subChannels;
     }
 }

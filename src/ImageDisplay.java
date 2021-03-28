@@ -5,10 +5,10 @@ import javax.swing.*;
 
 public class ImageDisplay {
     private JFrame frame;
-    private JLabel lbOriginalImage;
-    private JLabel lbProcessedImage;
-    private BufferedImage originalImage;
-    private BufferedImage processedImage;
+    private JLabel lbDctImage;
+    private JLabel lbDwtImage;
+    private BufferedImage dctImage;
+    private BufferedImage dwtImage;
     private final int WIDTH = 512;
     private final int HEIGHT = 512;
     private int m = 8;
@@ -44,28 +44,27 @@ public class ImageDisplay {
                     byte g = bytes[ind+height*width];
                     byte b = bytes[ind+height*width*2];
 
-                    int pix = 0xff000000 | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
-
                     RGB rgb = new RGB(r, g, b);
 
                     dctOutput.getRgbChannels()[y][x] = rgb;
                     dwtOutput.getRgbChannels()[y][x] = rgb;
-
-                    img.setRGB(x,y,pix);
                     ind++;
                 }
             }
 
-//            dctOutput.compress();
+            dctOutput.compress();
             dwtOutput.compress();
 
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-//                    RGB rgb = dctOutput.getRgbChannels()[y][x];
-                    RGB rgb = dwtOutput.getRgbChannels()[y][x];
+                    RGB dctRgb = dctOutput.getRgbChannels()[y][x];
+                    RGB dwtRgb = dwtOutput.getRgbChannels()[y][x];
 
-                    int pix = 0xff000000 | ((rgb.getR()) << 16) | ((rgb.getG()) << 8) | (rgb.getB());
-                    processedImage.setRGB(x, y, pix);
+                    int dctPix = 0xff000000 | ((dctRgb.getR()) << 16) | ((dctRgb.getG()) << 8) | (dctRgb.getB());
+                    int dwtPix = 0xff000000 | ((dwtRgb.getR()) << 16) | ((dwtRgb.getG()) << 8) | (dwtRgb.getB());
+
+                    dctImage.setRGB(x, y, dctPix);
+                    dwtImage.setRGB(x, y, dwtPix);
                 }
             }
         }
@@ -91,18 +90,18 @@ public class ImageDisplay {
 //        numCoefficient = 1;
 
         // Read in the specified image
-        originalImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-        processedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        dctImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        dwtImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 
-        readImageRGB(WIDTH, HEIGHT, args[0], originalImage);
+        readImageRGB(WIDTH, HEIGHT, args[0], dctImage);
 
         // Use label to display the image
         frame = new JFrame();
         GridBagLayout gLayout = new GridBagLayout();
         frame.getContentPane().setLayout(gLayout);
 
-        lbOriginalImage = new JLabel(new ImageIcon(originalImage));
-        lbProcessedImage = new JLabel(new ImageIcon(processedImage));
+        lbDctImage = new JLabel(new ImageIcon(dctImage));
+        lbDwtImage = new JLabel(new ImageIcon(dwtImage));
 
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -114,12 +113,12 @@ public class ImageDisplay {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
-        frame.getContentPane().add(lbOriginalImage, c);
+        frame.getContentPane().add(lbDctImage, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 1;
-        frame.getContentPane().add(lbProcessedImage, c);
+        frame.getContentPane().add(lbDwtImage, c);
 
         frame.pack();
         frame.setVisible(true);
